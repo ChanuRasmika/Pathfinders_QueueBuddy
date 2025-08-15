@@ -1,36 +1,59 @@
 package com.example.backend.service;
 
 import com.example.backend.dto.ApiResponse;
+import com.example.backend.dto.UserDto;
 import com.example.backend.entity.Users;
 import com.example.backend.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UsersService {
     private final UsersRepository usersRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UsersService(UsersRepository usersRepository) {
+    public UsersService(UsersRepository usersRepository, PasswordEncoder passwordEncoder) {
         this.usersRepository = usersRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public ResponseEntity<ApiResponse<Users>> addNewUsers(Users users){
+    public UserDto mapToDto(Users user) {
+        return new UserDto(
+                user.getUserId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getDateCreated()
+        );
+    }
+
+    public ResponseEntity<ApiResponse<UserDto>> addNewUsers(Users users){
         Optional<Users> optionalUsers = usersRepository.findByEmail(users.getEmail());
         if(optionalUsers.isPresent()){
             return ResponseEntity.ok(
-                    new ApiResponse<>("You Already SignedUp.Please Login.", optionalUsers.get())
+                    new ApiResponse<>("You Already SignedUp.Please Login.", mapToDto(optionalUsers.get()))
             );
         }
         users.setDateCreated(new Date(System.currentTimeMillis()));
+        users.setPassword(passwordEncoder.encode(users.getPassword()));
         Users savedUser = usersRepository.save(users);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>("Successfully Created Users.", savedUser));
+                .body(new ApiResponse<>("Successfully Created Users.", mapToDto(savedUser)));
+    }
+
+    public List<UserDto> getAllUsers(){
+        return usersRepository.findAll()
+                .stream()
+                .map(this::mapToDto)
+                .toList();
     }
 }
