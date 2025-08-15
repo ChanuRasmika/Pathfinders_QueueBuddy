@@ -2,7 +2,9 @@ package com.example.backend.service;
 
 import com.example.backend.dto.ApiResponse;
 import com.example.backend.dto.UserDto;
+import com.example.backend.entity.UserType;
 import com.example.backend.entity.Users;
+import com.example.backend.repository.UserTypeRepository;
 import com.example.backend.repository.UsersRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +25,17 @@ public class UsersService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final UserTypeRepository  userTypeRepository;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
 
     @Autowired
-    public UsersService(UsersRepository usersRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
+    public UsersService(UsersRepository usersRepository, PasswordEncoder passwordEncoder, EmailService emailService, UserTypeRepository userTypeRepository) {
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.userTypeRepository = userTypeRepository;
     }
 
     public UserDto mapToDto(Users user) {
@@ -52,6 +56,10 @@ public class UsersService {
             );
         }
         users.setDateCreated(new Date(System.currentTimeMillis()));
+        
+        UserType citizenType = userTypeRepository.findById(1).orElseThrow(() -> new RuntimeException("UserType not found"));
+        users.setUserTypeId(citizenType);
+
         users.setPassword(passwordEncoder.encode(users.getPassword()));
         Users savedUser = usersRepository.save(users);
 
