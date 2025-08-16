@@ -6,10 +6,20 @@ export const signup = async (userData) => {
     return response.data;
 };
 
-// Login (if you implement it later)
+// Login
 export const login = async (credentials) => {
     const response = await api.post("/auth/login", credentials);
     return response.data;
 };
 
+// Fetch authenticated user profile
+export const getUserProfile = async () => {
+    const response = await api.get("/api/me");
+    return response.data;
+};
+
+// Update user profile (simulated, as additional fields are stored in local storage)
+export const updateUserProfile = async (userData) => {
+    return userData;
+};
 
