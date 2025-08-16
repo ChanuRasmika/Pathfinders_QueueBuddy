@@ -56,7 +56,7 @@ public class UsersService {
             );
         }
         users.setDateCreated(new Date(System.currentTimeMillis()));
-        
+
         UserType citizenType = userTypeRepository.findById(1).orElseThrow(() -> new RuntimeException("UserType not found"));
         users.setUserTypeId(citizenType);
 
