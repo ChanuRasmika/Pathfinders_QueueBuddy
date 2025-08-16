@@ -1,10 +1,8 @@
 package com.example.backend.service;
 
-import com.example.backend.entity.Users;
 import com.example.backend.util.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,9 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -38,14 +36,19 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
+    //Extract Role from JWT
+    public String extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", String.class));
+    }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         return claimsResolver.apply(extractAllClaims(token));
     }
 
-
     public String generateToken(CustomUserDetails userDetails) {
-        return buildToken(Map.of(), userDetails);
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("role", userDetails.getRole());
+        return buildToken(extraClaims, userDetails);
     }
 
     public String buildToken(Map<String, Object> extraClaims, CustomUserDetails userDetails) {
@@ -65,18 +68,14 @@ public class JwtService {
         return jwtExpirationMillis;
     }
 
-
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
-
-
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
-
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
@@ -85,5 +84,4 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
-
 }

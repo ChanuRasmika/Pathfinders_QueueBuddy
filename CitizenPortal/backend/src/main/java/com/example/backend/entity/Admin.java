@@ -13,7 +13,7 @@ public class Admin {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int adminId;
     @Column(unique = true)
-    private String username;
+    private String email;
     private String password;
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -28,9 +28,9 @@ public class Admin {
     public Admin() {
     }
 
-    public Admin(int adminId, String username, String password, UserType userTypeId, Department department) {
+    public Admin(int adminId, String email, String password, UserType userTypeId, Department department) {
         this.adminId = adminId;
-        this.username = username;
+        this.email = email;
         this.password = password;
         this.userTypeId = userTypeId;
         this.department = department;
@@ -40,7 +40,7 @@ public class Admin {
     public String toString() {
         return "Admin{" +
                 "adminId=" + adminId +
-                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", userTypeId=" + userTypeId +
                 ", department=" + department +

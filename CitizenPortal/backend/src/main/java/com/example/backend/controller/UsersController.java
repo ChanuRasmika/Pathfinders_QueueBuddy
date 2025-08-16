@@ -29,14 +29,22 @@ public class UsersController {
         return usersService.addNewUsers(user);
     }
 
-    // Get current authenticated user
+    // Get current authenticated citizen
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<UserDto>> authenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        // Assuming you use CustomUserDetails
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Users currentUser = userDetails.getUser();
+
+        // Check role using the getRole() method instead of authorities
+        String role = userDetails.getRole();
+        if (!"Citizen".equals(role)) {
+            throw new RuntimeException("This endpoint is only available for Citizens");
+        }
+
+        // Fetch citizen from users table
+        Users currentUser = usersService.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Citizen not found"));
+
         UserDto mappedUser = usersService.mapToDto(currentUser);
 
         return ResponseEntity.ok(new ApiResponse<>("Authenticated user", mappedUser));

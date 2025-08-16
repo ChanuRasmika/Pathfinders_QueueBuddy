@@ -13,7 +13,7 @@ public class GovernmentOfficer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int officerId;
-    private String username;
+    private String email;
     private String password;
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -27,9 +27,9 @@ public class GovernmentOfficer {
     public GovernmentOfficer() {
     }
 
-    public GovernmentOfficer(int officerId, String username, String password, UserType userTypeId, Department department) {
+    public GovernmentOfficer(int officerId, String email, String password, UserType userTypeId, Department department) {
         this.officerId = officerId;
-        this.username = username;
+        this.email = email;
         this.password = password;
         this.userTypeId = userTypeId;
         this.department = department;
@@ -39,7 +39,7 @@ public class GovernmentOfficer {
     public String toString() {
         return "GovernmentOfficer{" +
                 "officerId=" + officerId +
-                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", userTypeId=" + userTypeId +
                 ", department=" + department +

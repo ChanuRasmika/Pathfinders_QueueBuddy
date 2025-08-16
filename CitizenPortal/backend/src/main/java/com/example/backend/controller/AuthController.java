@@ -24,9 +24,18 @@ public class AuthController {
         this.authenticationService = authenticationService;
     }
 
-
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestBody LogInRequestDto loginUserDto) {
-        return authenticationService.login(loginUserDto);
+    public ResponseEntity<ApiResponse<Map<String, Object>>> citizenLogin(@RequestBody LogInRequestDto loginUserDto) {
+        return authenticationService.loginWithRole(loginUserDto, "Citizen");
+    }
+
+    @PostMapping("/admin/login")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> adminLogin(@RequestBody LogInRequestDto loginUserDto) {
+        return authenticationService.loginWithRole(loginUserDto, "Admin");
+    }
+
+    @PostMapping("/officer/login")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> officerLogin(@RequestBody LogInRequestDto loginUserDto) {
+        return authenticationService.loginWithRole(loginUserDto, "Gov Officer");
     }
 }
