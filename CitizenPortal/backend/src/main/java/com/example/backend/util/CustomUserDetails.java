@@ -1,38 +1,40 @@
 package com.example.backend.util;
 
-import com.example.backend.entity.UserType;
-import com.example.backend.entity.Users;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
-    private final Users user;
+    private final String username;
+    private final String password;
+    // Getter for role - needed for JWT generation and extraction
+    @Getter
+    private final String role;
 
-    public CustomUserDetails(Users user) {
-        this.user = user;
+    public CustomUserDetails(String username, String password, String role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        UserType usersType = user.getUserTypeId();
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(usersType.getUserTypeName()));
-        return authorities;
+        // Add ROLE_ prefix for Spring Security conventions
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase().replace(" ", "_")));
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return username;
     }
 
     @Override
@@ -54,7 +56,5 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    public Users getUser() {
-        return user;
-    }
+
 }

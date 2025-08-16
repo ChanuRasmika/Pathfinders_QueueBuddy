@@ -25,7 +25,7 @@ public class UsersService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
-    private final UserTypeRepository  userTypeRepository;
+    private final UserTypeRepository userTypeRepository;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
@@ -48,9 +48,9 @@ public class UsersService {
         );
     }
 
-    public ResponseEntity<ApiResponse<UserDto>> addNewUsers(Users users){
+    public ResponseEntity<ApiResponse<UserDto>> addNewUsers(Users users) {
         Optional<Users> optionalUsers = usersRepository.findByEmail(users.getEmail());
-        if(optionalUsers.isPresent()){
+        if (optionalUsers.isPresent()) {
             return ResponseEntity.ok(
                     new ApiResponse<>("You Already SignedUp.Please Login.", mapToDto(optionalUsers.get()))
             );
@@ -83,10 +83,15 @@ public class UsersService {
                 .body(new ApiResponse<>("Successfully Created Users.", mapToDto(savedUser)));
     }
 
-    public List<UserDto> getAllUsers(){
+    public List<UserDto> getAllUsers() {
         return usersRepository.findAll()
                 .stream()
                 .map(this::mapToDto)
                 .toList();
+    }
+
+    // Fixed: Return Optional<Users> directly instead of wrapping in another Optional
+    public Optional<Users> findByEmail(String email) {
+        return usersRepository.findByEmail(email);
     }
 }
