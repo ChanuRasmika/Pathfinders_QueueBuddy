@@ -5,11 +5,13 @@ import App from "./App.jsx";
 import './index.css';
 import GlobalStyle from './globalStyles.js';
 
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
       <GlobalStyle />
       <App />
+      
     </BrowserRouter>
   </StrictMode>
 );
