@@ -36,6 +36,9 @@ public class SecurityConfiguration {
                                 "/api/users"
                         )
                         .permitAll()
+                        .requestMatchers("/api/departments/**").hasRole("CITIZEN")
+                        .requestMatchers("/api/submissions/**").hasRole("CITIZEN")
+                        .requestMatchers("/api/appointments/**").hasRole("CITIZEN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
