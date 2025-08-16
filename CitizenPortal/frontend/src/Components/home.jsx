@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"; // added for navigation
 import styled from "styled-components"
 
 const HomeContainer = styled.div`
@@ -15,10 +16,12 @@ const Navbar = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1.5rem 3rem;   
+  min-height: 100px;       
 `
 
 const Logo = styled.h1`
-  font-size: 1.5rem;
+  font-size: 2.5rem;
   font-weight: 600;
   color: #1a1a1a;
   margin: 0;
@@ -33,7 +36,7 @@ const NavItems = styled.div`
 const NavItem = styled.button`
   background: none;
   border: none;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 500;
   cursor: pointer;
   padding: 0.5rem 0;
@@ -108,13 +111,14 @@ const ActionDescription = styled.p`
 
 const Home = ({ onLogout }) => {
   const [activeNav, setActiveNav] = useState("Home")
+  const navigate = useNavigate(); // initialize navigate
 
   const navItems = ["Home", "My Appointments", "Book Appointment", "Feedback", "Profile"]
 
   const quickActions = [
     {
       title: "Book New Appointment",
-      description: "Schedule your next appointment with ease",
+      description: "Schedule your next appointment.",
     },
     {
       title: "View My Appointments",
@@ -124,19 +128,28 @@ const Home = ({ onLogout }) => {
       title: "Leave Feedback",
       description: "Share your experience and help us improve",
     },
-    {
-      title: "Update Profile",
-      description: "Manage your personal information and preferences",
-    },
   ]
+
+  const handleNavClick = (item) => {
+    setActiveNav(item)
+    if (item === "Profile") {
+      navigate("/profile") // navigate to Profile page
+    } else if (item === "Home") {
+      navigate("/home") // optional, navigate to home
+    }
+  }
 
   return (
     <HomeContainer>
       <Navbar>
-        <Logo>Dashboard</Logo>
+        <Logo>QueueBuddy</Logo>
         <NavItems>
           {navItems.map((item) => (
-            <NavItem key={item} active={activeNav === item} onClick={() => setActiveNav(item)}>
+            <NavItem
+              key={item}
+              active={activeNav === item}
+              onClick={() => handleNavClick(item)}
+            >
               {item}
             </NavItem>
           ))}
@@ -145,7 +158,7 @@ const Home = ({ onLogout }) => {
 
       <MainContent>
         <WelcomeSection>
-          <WelcomeTitle>Welcome to Your Dashboard</WelcomeTitle>
+          <WelcomeTitle>Welcome to QueueBuddy</WelcomeTitle>
           <WelcomeText>
             Manage your appointments, view your schedule, and access all your important information in one place.
           </WelcomeText>
