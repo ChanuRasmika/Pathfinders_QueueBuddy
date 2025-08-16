@@ -57,4 +57,20 @@ public class EmailService {
         // Send
         mailSender.send(message);
     }
+
+    public void sendEmail(String to, String subject, String text) {
+        MimeMessage message = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, StandardCharsets.UTF_8.name());
+            helper.setFrom(fromEmail);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(text, false); // false → plain text, true → HTML
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send email", e);
+        }
+    }
+
+
 }
