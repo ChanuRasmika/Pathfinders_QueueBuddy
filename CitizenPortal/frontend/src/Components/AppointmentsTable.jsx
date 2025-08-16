@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import { fetchMyAppointments, cancelAppointment } from "./api/appointmentsApi.js";
-import RescheduleModal from "./RescheduleModal";
+import "./Appointments.css";   // 👈 centralized CSS file
 
 export default function AppointmentsTable() {
     const [appointments, setAppointments] = useState([]);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(true);
-    const [modalOpen, setModalOpen] = useState(false);
+
+    const [rescheduleOpen, setRescheduleOpen] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
+
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [appointmentToCancel, setAppointmentToCancel] = useState(null);
+    const [cancelLoading, setCancelLoading] = useState(false);
+
+    const [newDate, setNewDate] = useState("");
+    const [newTime, setNewTime] = useState("");
 
     async function loadAppointments() {
         setLoading(true);
@@ -26,80 +34,182 @@ export default function AppointmentsTable() {
         loadAppointments();
     }, []);
 
-    async function handleCancel(id) {
-        if (!window.confirm("Are you sure you want to cancel this appointment?")) return;
+    // Cancel confirm
+    async function handleCancelConfirmed() {
+        if (!appointmentToCancel) return;
+        setCancelLoading(true);
         try {
-            await cancelAppointment(id, "Cancelled by user");
+            await cancelAppointment(appointmentToCancel.id, "Cancelled by user");
             await loadAppointments();
         } catch (err) {
             alert(err.message || "Failed to cancel appointment");
+        } finally {
+            setCancelLoading(false);
+            setConfirmOpen(false);
+            setAppointmentToCancel(null);
         }
     }
 
+    function handleCancel(id) {
+        const appt = appointments.find((a) => a.id === id);
+        setAppointmentToCancel(appt);
+        setConfirmOpen(true);
+    }
+
+    // Reschedule
     function handleOpenReschedule(id) {
-        setSelectedAppointment(id);
-        setModalOpen(true);
+        const appt = appointments.find((a) => a.id === id);
+        setSelectedAppointment(appt);
+        setRescheduleOpen(true);
+    }
+
+    function handleRescheduleSave() {
+        // fake update
+        setAppointments((prev) =>
+            prev.map((a) =>
+                a.id === selectedAppointment.id
+                    ? { ...a, date: newDate, time: newTime }
+                    : a
+            )
+        );
+        setRescheduleOpen(false);
+        setNewDate("");
+        setNewTime("");
     }
 
     return (
-        <section id="my-appointments" className="p-6">
-            <h1 className="text-2xl font-bold mb-4">My Appointments</h1>
+        <section className="appointments-section">
+            <div className="appointments-card">
+                <h1 className="appointments-title">My Appointments</h1>
 
-            {loading && <p>Loading...</p>}
-            {error && <p className="text-red-500">{error}</p>}
+                {loading && <p className="text-center">Loading...</p>}
+                {error && <p className="error">{error}</p>}
 
-            {!loading && appointments.length === 0 && <p>No appointments found.</p>}
+                {!loading && appointments.length === 0 && (
+                    <p className="text-center">No appointments found.</p>
+                )}
 
-            {appointments.length > 0 && (
-                <div className="overflow-x-auto">
-                    <table className="w-full border border-gray-200 rounded-xl overflow-hidden">
-                        <thead className="bg-gray-100 text-left">
-                        <tr>
-                            <th className="p-3">Date</th>
-                            <th className="p-3">Time</th>
-                            <th className="p-3">Department</th>
-                            <th className="p-3">Status</th>
-                            <th className="p-3">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {appointments.map((a) => (
-                            <tr key={a.id} className="border-t">
-                                <td className="p-3">{a.date}</td>
-                                <td className="p-3">{a.time}</td>
-                                <td className="p-3">{a.departmentName}</td>
-                                <td className="p-3">{a.status}</td>
-                                <td className="p-3 space-x-2">
-                                    {a.status === "BOOKED" && (
-                                        <>
-                                            <button
-                                                onClick={() => handleCancel(a.id)}
-                                                className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600"
-                                            >
-                                                Cancel
-                                            </button>
-                                            <button
-                                                onClick={() => handleOpenReschedule(a.id)}
-                                                className="px-3 py-1 rounded bg-yellow-500 text-white hover:bg-yellow-600"
-                                            >
-                                                Reschedule
-                                            </button>
-                                        </>
-                                    )}
-                                </td>
+                {appointments.length > 0 && (
+                    <div className="table-wrapper">
+                        <table className="appointments-table">
+                            <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+                            </thead>
+                            <tbody>
+                            {appointments.map((a, index) => (
+                                <tr key={a.id} className={index % 2 === 0 ? "even-row" : "odd-row"}>
+                                    <td>{a.date}</td>
+                                    <td>{a.time}</td>
+                                    <td>{a.departmentName}</td>
+                                    <td>
+                                        <span
+                                            className={`status-badge ${
+                                                a.status === "BOOKED" ? "status-booked" : "status-other"
+                                            }`}
+                                        >
+                                            {a.status}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {a.status === "BOOKED" && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleCancel(a.id)}
+                                                    className="btn btn-cancel"
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    onClick={() => handleOpenReschedule(a.id)}
+                                                    className="btn btn-reschedule"
+                                                >
+                                                    Reschedule
+                                                </button>
+                                            </>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
 
-            <RescheduleModal
-                open={modalOpen}
-                appointmentId={selectedAppointment}
-                onClose={() => setModalOpen(false)}
-                onSuccess={loadAppointments}
-            />
+                {/* Reschedule Modal */}
+                {rescheduleOpen && (
+                    <div className="modal-overlay">
+                        <div className="modal-box">
+                            <h2>Reschedule Appointment</h2>
+                            <p>
+                                {selectedAppointment?.departmentName} – Current:{" "}
+                                {selectedAppointment?.date} at {selectedAppointment?.time}
+                            </p>
+                            <div className="modal-inputs">
+                                <input
+                                    type="date"
+                                    value={newDate}
+                                    onChange={(e) => setNewDate(e.target.value)}
+                                />
+                                <input
+                                    type="time"
+                                    value={newTime}
+                                    onChange={(e) => setNewTime(e.target.value)}
+                                />
+                            </div>
+                            <div className="modal-actions">
+                                <button
+                                    className="btn btn-reschedule"
+                                    disabled={!newDate || !newTime}
+                                    onClick={handleRescheduleSave}
+                                >
+                                    Save
+                                </button>
+                                <button
+                                    className="btn btn-cancel"
+                                    onClick={() => setRescheduleOpen(false)}
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Cancel Confirmation */}
+                {confirmOpen && (
+                    <div className="confirm-overlay">
+                        <div className="confirm-box">
+                            <h2>Cancel Appointment</h2>
+                            <p>
+                                Are you sure you want to cancel your appointment on{" "}
+                                {appointmentToCancel?.date} at {appointmentToCancel?.time}?
+                            </p>
+                            <div className="confirm-actions">
+                                <button
+                                    className="btn btn-cancel"
+                                    onClick={handleCancelConfirmed}
+                                    disabled={cancelLoading}
+                                >
+                                    {cancelLoading ? <span className="spinner"></span> : "Yes, Cancel"}
+                                </button>
+                                <button
+                                    className="btn btn-reschedule"
+                                    onClick={() => setConfirmOpen(false)}
+                                    disabled={cancelLoading}
+                                >
+                                    No, Keep
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </section>
     );
 }
