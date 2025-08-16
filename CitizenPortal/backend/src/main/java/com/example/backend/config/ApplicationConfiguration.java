@@ -35,15 +35,15 @@ public class ApplicationConfiguration {
         return username -> {
             // Try UsersRepository for Citizen
             return usersRepository.findByEmail(username)
-                    .map(user -> new CustomUserDetails(user.getEmail(), user.getPassword(), "Citizen"))
+                    .map(user -> new CustomUserDetails(user.getId(), user.getEmail(), user.getPassword(), "Citizen"))
                     .orElseGet(() ->
                             // Try AdminRepository for Admin
                             adminRepository.findByEmail(username)
-                                    .map(admin -> new CustomUserDetails(admin.getEmail(), admin.getPassword(), "Admin"))
+                                    .map(admin -> new CustomUserDetails(admin.getId(), admin.getEmail(), admin.getPassword(), "Admin"))
                                     .orElseGet(() ->
                                             // Try GovernmentOfficerRepository for Gov Officer
                                             officerRepository.findByEmail(username)
-                                                    .map(officer -> new CustomUserDetails(officer.getEmail(), officer.getPassword(), "Gov Officer"))
+                                                    .map(officer -> new CustomUserDetails(officer.getId(), officer.getEmail(), officer.getPassword(), "Gov Officer"))
                                                     .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username))
                                     )
                     );

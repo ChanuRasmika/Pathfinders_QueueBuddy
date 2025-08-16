@@ -52,8 +52,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (userEmail != null && authentication == null && !jwtService.isTokenExpired(jwt)) {
+                // Extract userId from JWT claims
+                Integer userId = jwtService.extractUserId(jwt);
                 // Create CustomUserDetails from JWT claims (no database lookup needed)
-                CustomUserDetails userDetails = new CustomUserDetails(userEmail, "", role);
+                CustomUserDetails userDetails = new CustomUserDetails(userId, userEmail, "", role);
 
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

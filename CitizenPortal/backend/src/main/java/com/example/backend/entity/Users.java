@@ -56,4 +56,9 @@ public class Users {
                 ", dateCreated=" + dateCreated +
                 '}';
     }
+
+    public int getId() {
+        return userId;
+    }
+
 }

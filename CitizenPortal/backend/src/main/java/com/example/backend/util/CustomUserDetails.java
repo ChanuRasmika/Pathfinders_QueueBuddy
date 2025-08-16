@@ -1,6 +1,7 @@
 package com.example.backend.util;
 
 import lombok.Getter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,11 +15,23 @@ public class CustomUserDetails implements UserDetails {
     // Getter for role - needed for JWT generation and extraction
     @Getter
     private final String role;
+    // Getter for userId - needed for user identification
+    @Getter
+    private final Integer userId;
 
-    public CustomUserDetails(String username, String password, String role) {
+    public CustomUserDetails(Integer userId, String username, String password, String role) {
+        this.userId = userId;
         this.username = username;
         this.password = password;
         this.role = role;
+    }
+
+    // Utility method to extract userId from Authentication
+    public static Integer requireUserId(Authentication auth) {
+        if (auth == null || !(auth.getPrincipal() instanceof CustomUserDetails p)) {
+            throw new IllegalStateException("Unauthenticated");
+        }
+        return p.getUserId();
     }
 
     @Override
