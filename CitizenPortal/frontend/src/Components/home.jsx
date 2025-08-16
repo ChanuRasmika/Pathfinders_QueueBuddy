@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"; // added for navigation
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components"
 
 const HomeContainer = styled.div`
@@ -16,8 +16,8 @@ const Navbar = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 3rem;   
-  min-height: 100px;       
+  padding: 1.5rem 3rem;
+  min-height: 100px;
 `
 
 const Logo = styled.h1`
@@ -111,7 +111,7 @@ const ActionDescription = styled.p`
 
 const Home = ({ onLogout }) => {
   const [activeNav, setActiveNav] = useState("Home")
-  const navigate = useNavigate(); // initialize navigate
+  const navigate = useNavigate();
 
   const navItems = ["Home", "My Appointments", "Book Appointment", "Feedback", "Profile"]
 
@@ -119,61 +119,73 @@ const Home = ({ onLogout }) => {
     {
       title: "Book New Appointment",
       description: "Schedule your next appointment.",
+      route: "/bookappointments",
     },
     {
       title: "View My Appointments",
       description: "Check your upcoming and past appointments",
+      route: "/appointments",
     },
     {
       title: "Leave Feedback",
       description: "Share your experience and help us improve",
+      route: "/feedback",
     },
   ]
 
   const handleNavClick = (item) => {
     setActiveNav(item)
     if (item === "Profile") {
-      navigate("/profile") // navigate to Profile page
+      navigate("/profile")
     } else if (item === "Home") {
-      navigate("/home") // optional, navigate to home
+      navigate("/home")
+    } else if (item === "My Appointments") {
+      navigate("/appointments")
+    } else if (item === "Book Appointment") {
+      navigate("/bookappointments")
+    } else if (item === "Feedback") {
+      navigate("/feedback")
     }
   }
 
   return (
-    <HomeContainer>
-      <Navbar>
-        <Logo>QueueBuddy</Logo>
-        <NavItems>
-          {navItems.map((item) => (
-            <NavItem
-              key={item}
-              active={activeNav === item}
-              onClick={() => handleNavClick(item)}
-            >
-              {item}
-            </NavItem>
-          ))}
-        </NavItems>
-      </Navbar>
+      <HomeContainer>
+        <Navbar>
+          <Logo>QueueBuddy</Logo>
+          <NavItems>
+            {navItems.map((item) => (
+                <NavItem
+                    key={item}
+                    active={activeNav === item}
+                    onClick={() => handleNavClick(item)}
+                >
+                  {item}
+                </NavItem>
+            ))}
+          </NavItems>
+        </Navbar>
 
-      <MainContent>
-        <WelcomeSection>
-          <WelcomeTitle>Welcome to QueueBuddy</WelcomeTitle>
-          <WelcomeText>
-            Manage your appointments, view your schedule, and access all your important information in one place.
-          </WelcomeText>
-        </WelcomeSection>
+        <MainContent>
+          <WelcomeSection>
+            <WelcomeTitle>Welcome to QueueBuddy</WelcomeTitle>
+            <WelcomeText>
+              Manage your appointments, view your schedule, and access all your important information in one place.
+            </WelcomeText>
+          </WelcomeSection>
 
-        <QuickActions>
-          {quickActions.map((action, index) => (
-            <ActionCard key={index}>
-              <ActionTitle>{action.title}</ActionTitle>
-              <ActionDescription>{action.description}</ActionDescription>
-            </ActionCard>
-          ))}
-        </QuickActions>
-      </MainContent>
-    </HomeContainer>
+          <QuickActions>
+            {quickActions.map((action, index) => (
+                <ActionCard
+                    key={index}
+                    onClick={() => navigate(action.route)}  // 🔗 added navigation
+                >
+                  <ActionTitle>{action.title}</ActionTitle>
+                  <ActionDescription>{action.description}</ActionDescription>
+                </ActionCard>
+            ))}
+          </QuickActions>
+        </MainContent>
+      </HomeContainer>
   )
 }
 
