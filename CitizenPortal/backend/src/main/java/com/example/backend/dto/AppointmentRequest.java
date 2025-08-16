@@ -7,6 +7,6 @@ import java.time.LocalTime;
 public record AppointmentRequest(
         @NotNull Integer departmentId,
         @NotNull LocalDate appointmentDate,
-        @NotNull LocalTime appointmentTime,
-        @NotNull Integer submittedId
+        @NotNull LocalTime appointmentTime
+
 ) {}

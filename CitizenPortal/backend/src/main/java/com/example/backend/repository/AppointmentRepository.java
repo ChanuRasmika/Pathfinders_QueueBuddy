@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.example.backend.entity.AppointmentStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -32,4 +33,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     boolean existsByDepartmentIdAndAppointmentDateAndAppointmentTimeAndStatusIn(
             Integer departmentId, LocalDate date, LocalTime time,
             java.util.Collection<AppointmentStatus> statuses);
+
+    @Query("SELECT MAX(a.queuePlace) FROM Appointment a WHERE a.departmentId = :departmentId AND a.appointmentDate = :date")
+    Integer maxQueuePlaceByDepartmentAndDate(@Param("departmentId") Integer departmentId,
+                                             @Param("date") LocalDate date);
+
+
 }

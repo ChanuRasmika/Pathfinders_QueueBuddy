@@ -40,15 +40,19 @@ public class AppointmentService {
 
     public Integer book(Integer userId, AppointmentRequest req) {
         // Ensure submitted doc exists & belongs to user & department matches
-        SubmittedDocument doc = submittedRepo.findById(req.submittedId())
-                .orElseThrow(() -> new IllegalArgumentException("Submitted document not found."));
-        if (!doc.getUserId().equals(userId))
-            throw new SecurityException("Submitted document does not belong to current user.");
-        if (!doc.getDepartmentId().equals(req.departmentId()))
-            throw new IllegalArgumentException("Submitted document is for a different department.");
+//        SubmittedDocument doc = submittedRepo.findById(req.submittedId())
+//                .orElseThrow(() -> new IllegalArgumentException("Submitted document not found."));
+//        if (!doc.getUserId().equals(userId))
+//            throw new SecurityException("Submitted document does not belong to current user.");
+//        if (!doc.getDepartmentId().equals(req.departmentId()))
+//            throw new IllegalArgumentException("Submitted document is for a different department.");
 
-        Integer maxQueue = appointmentRepo.maxQueuePlace(req.departmentId(), req.appointmentDate(), req.appointmentTime());
+        Integer maxQueue = appointmentRepo.maxQueuePlaceByDepartmentAndDate(
+                req.departmentId(),
+                req.appointmentDate()
+        );
         int queuePlace = (maxQueue == null ? 0 : maxQueue) + 1;
+
 
         Appointment a = new Appointment();
         a.setDepartmentId(req.departmentId());
@@ -58,7 +62,9 @@ public class AppointmentService {
         a.setBookedDate(Instant.now());
         a.setQueuePlace(queuePlace);
 
-        return appointmentRepo.save(a).getAppointmentId();
+        appointmentRepo.save(a);
+
+        return queuePlace;
     }
 
     public Page<AppointmentSummaryDto> listMyAppointments(Integer userId, Pageable pageable) {
