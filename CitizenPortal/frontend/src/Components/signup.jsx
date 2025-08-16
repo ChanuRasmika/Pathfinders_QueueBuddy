@@ -1,8 +1,7 @@
-
-
 import { useState } from "react"
 import styled from "styled-components"
 import { useNavigate } from "react-router-dom";
+import { signup } from "./api/userService.jsx";
 
 const Container = styled.div`
   min-height: 100vh;
@@ -30,7 +29,7 @@ const Header = styled.div`
 
 const Title = styled.h1`
   font-size: 30px;
-  font-weight: 600;
+  font-weight: 600; 
   color: #1f2937;
   margin: 0 0 8px 0;
 `
@@ -124,104 +123,156 @@ const LoginLink = styled.a`
   }
 `
 
-const SignUp = ({ onSwitchToLogin }) => {
-    const navigate = useNavigate();
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+
+const SignUp = () => {
+  const navigate = useNavigate();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState(""); // Add state for error messages
+  const [loading, setLoading] = useState(false); // Add state for loading
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(""); // Clear previous errors
+    setLoading(true); // Set loading state
+
+    // Check if passwords match
     if (password !== confirmPassword) {
-      alert("Passwords do not match")
-      return
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
     }
-    // Handle signup logic here
-    console.log("Signup attempt:", { firstName, lastName, email, password })
-  }
+
+    // Prepare data for the backend
+    const userData = {
+      firstName,
+      lastName,
+      email,
+      password,
+    };
+
+    try {
+      // Call the signup API
+      const response = await signup(userData);
+      console.log("Signup successful:", response);
+
+      // If the backend returns a token, save it to localStorage
+      if (response.token) {
+        localStorage.setItem("token", response.token);
+      }
+
+      // Redirect to login page or dashboard
+      navigate("/login"); // Or navigate("/dashboard") if signup logs the user in
+    } catch (error) {
+      // Handle errors from the backend
+      const errorMessage =
+          error.response?.data?.message || "Signup failed. Please try again.";
+      setError(errorMessage);
+      console.error("Signup error:", error);
+    } finally {
+      setLoading(false); // Reset loading state
+    }
+  };
 
   return (
-    <Container>
-      <SignupCard>
-        <Header>
-          <Title>Create Account</Title>
-          <Subtitle>Sign up to get started</Subtitle>
-        </Header>
+      <Container>
+        <SignupCard>
+          <Header>
+            <Title>Create Account</Title>
+            <Subtitle>Sign up to get started</Subtitle>
+          </Header>
 
-        <Form onSubmit={handleSubmit}>
-          <FormTitle>Sign Up</FormTitle>
+          <Form onSubmit={handleSubmit}>
+            <FormTitle>Sign Up</FormTitle>
 
-          <FormGroup>
-            <Label htmlFor="firstName">First Name</Label>
-            <Input
-              id="firstName"
-              type="text"
-              placeholder="Enter first name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
-          </FormGroup>
+            {/* Display error message if exists */}
+            {error && (
+                <div style={{ color: "red", marginBottom: "16px", textAlign: "center" }}>
+                  {error}
+                </div>
+            )}
 
-          <FormGroup>
-            <Label htmlFor="lastName">Last Name</Label>
-            <Input
-              id="lastName"
-              type="text"
-              placeholder="Enter last name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
-          </FormGroup>
+            <FormGroup>
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                  id="firstName"
+                  type="text"
+                  placeholder="Enter first name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                  disabled={loading} // Disable input during loading
+              />
+            </FormGroup>
 
-          <FormGroup>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </FormGroup>
+            <FormGroup>
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                  id="lastName"
+                  type="text"
+                  placeholder="Enter last name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                  disabled={loading}
+              />
+            </FormGroup>
 
-          <FormGroup>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </FormGroup>
+            <FormGroup>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+              />
+            </FormGroup>
 
-          <FormGroup>
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
-          </FormGroup>
+            <FormGroup>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+              />
+            </FormGroup>
 
-          <SignupButton type="submit">Sign Up</SignupButton>
+            <FormGroup>
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirm password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  disabled={loading}
+              />
+            </FormGroup>
 
-          <LoginContainer>
-            Already have an account?  <LoginLink onClick={() => navigate("/login")}>Log in</LoginLink>
-          </LoginContainer>
-        </Form>
-      </SignupCard>
-    </Container>
-  )
-}
+            <SignupButton type="submit" disabled={loading}>
+              {loading ? "Signing Up..." : "Sign Up"}
+            </SignupButton>
 
-export default SignUp
+            <LoginContainer>
+              Already have an account?{" "}
+              <LoginLink onClick={() => navigate("/login")}>Log in</LoginLink>
+            </LoginContainer>
+          </Form>
+        </SignupCard>
+      </Container>
+  );
+};
+
+export default SignUp;

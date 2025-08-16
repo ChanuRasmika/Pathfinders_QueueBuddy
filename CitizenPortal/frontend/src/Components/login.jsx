@@ -2,6 +2,7 @@
 import { useState } from "react"
 import styled from "styled-components"
 import { useNavigate } from "react-router-dom";
+import { login } from "./api/userService.jsx";
 
 
 const Container = styled.div`
@@ -142,75 +143,122 @@ const SignUpLink = styled.a`
 `
 
 const Login = ({ onSwitchToSignUp }) => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-    const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); // Add state for error messages
+  const [loading, setLoading] = useState(false); // Add state for loading
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // Handle login logic here
-    console.log("Login attempt:", { email, password })
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(""); // Clear previous errors
+    setLoading(true); // Set loading state
+
+    // Prepare data for the backend
+    const credentials = {
+      email,
+      password,
+    };
+
+    try {
+      // Call the login API
+      const response = await login(credentials);
+      console.log("Login successful:", response);
+
+      // Store the token from the response in localStorage
+      const token = response.data?.token;
+      if (token) {
+        localStorage.setItem("token", token);
+      } else {
+        throw new Error("No token received from server");
+      }
+
+      // Redirect to dashboard or home page
+      navigate("/dashboard"); // Adjust the route as needed
+    } catch (error) {
+      // Handle errors from the backend
+      const errorMessage =
+          error.response?.data?.message || "Login failed. Please check your credentials.";
+      setError(errorMessage);
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false); // Reset loading state
+    }
+  };
 
   const handleForgotPassword = () => {
-    // Handle forgot password logic here
-    console.log("Forgot password clicked")
-  }
+    // Placeholder for forgot password logic
+    console.log("Forgot password clicked");
+    // Optionally navigate to a forgot password page
+    navigate("/forgot-password");
+  };
 
-const handleSignUp = () => {
-  onSwitchToSignUp();
-};
-
+  const handleSignUp = () => {
+    onSwitchToSignUp();
+  };
 
   return (
-    <Container>
-      <LoginCard>
-        <Header>
-          <Title>QueueBuddy</Title>
-          <Subtitle>Sign in to your account</Subtitle>
-        </Header>
+      <Container>
+        <LoginCard>
+          <Header>
+            <Title>QueueBuddy</Title>
+            <Subtitle>Sign in to your account</Subtitle>
+          </Header>
 
-        <Form onSubmit={handleSubmit}>
-          <FormTitle>Log In</FormTitle>
+          <Form onSubmit={handleSubmit}>
+            <FormTitle>Log In</FormTitle>
 
-          <FormGroup>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Enter email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </FormGroup>
+            {/* Display error message if exists */}
+            {error && (
+                <div style={{ color: "red", marginBottom: "16px", textAlign: "center" }}>
+                  {error}
+                </div>
+            )}
 
-          <FormGroup>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </FormGroup>
+            <FormGroup>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading} // Disable input during loading
+              />
+            </FormGroup>
 
-          <ForgotPasswordContainer>
-            <ForgotPasswordLink onClick={handleForgotPassword}>Forgot password?</ForgotPasswordLink>
-          </ForgotPasswordContainer>
+            <FormGroup>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+              />
+            </FormGroup>
 
-          <LoginButton type="submit">Log In</LoginButton>
+            <ForgotPasswordContainer>
+              <ForgotPasswordLink onClick={handleForgotPassword}>
+                Forgot password?
+              </ForgotPasswordLink>
+            </ForgotPasswordContainer>
 
-          <SignUpContainer>
-            {"Don't have an account? "}
-             <SignUpLink onClick={() => navigate("/signup")}>Sign up</SignUpLink>
-          </SignUpContainer>
-        </Form>
-      </LoginCard>
-    </Container>
-  )
-}
+            <LoginButton type="submit" disabled={loading}>
+              {loading ? "Logging In..." : "Log In"}
+            </LoginButton>
 
-export default Login
+            <SignUpContainer>
+              {"Don't have an account? "}
+              <SignUpLink onClick={() => navigate("/signup")}>Sign up</SignUpLink>
+            </SignUpContainer>
+          </Form>
+        </LoginCard>
+      </Container>
+  );
+};
+
+export default Login;
