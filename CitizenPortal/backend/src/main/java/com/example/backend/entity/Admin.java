@@ -46,4 +46,9 @@ public class Admin {
                 ", department=" + department +
                 '}';
     }
+
+    public int getId() {
+        return adminId;
+    }
+
 }

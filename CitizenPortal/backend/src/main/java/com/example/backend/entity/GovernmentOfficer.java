@@ -45,4 +45,8 @@ public class GovernmentOfficer {
                 ", department=" + department +
                 '}';
     }
+    public int getId() {
+        return officerId;
+    }
+
 }

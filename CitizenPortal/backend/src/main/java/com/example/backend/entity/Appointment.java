@@ -30,4 +30,8 @@ public class Appointment {
 
     @Column(name = "queue_place")
     private Integer queuePlace;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 24)
+    private AppointmentStatus status = AppointmentStatus.BOOKED;
 }

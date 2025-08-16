@@ -46,13 +46,13 @@ public class AuthenticationService {
         switch (role) {
             case "Citizen":
                 return loginInRepository(loginUserDto, usersRepository, role,
-                        u -> ((Users) u).getEmail(), u -> ((Users) u).getPassword());
+                        u -> ((Users) u).getEmail(), u -> ((Users) u).getPassword(), u -> ((Users) u).getId());
             case "Admin":
                 return loginInRepository(loginUserDto, adminRepository, role,
-                        u -> ((Admin) u).getEmail(), u -> ((Admin) u).getPassword());
+                        u -> ((Admin) u).getEmail(), u -> ((Admin) u).getPassword(), u -> ((Admin) u).getId());
             case "Gov Officer":
                 return loginInRepository(loginUserDto, officerRepository, role,
-                        u -> ((GovernmentOfficer) u).getEmail(), u -> ((GovernmentOfficer) u).getPassword());
+                        u -> ((GovernmentOfficer) u).getEmail(), u -> ((GovernmentOfficer) u).getPassword(), u -> ((GovernmentOfficer) u).getId());
             default:
                 throw new RuntimeException("Invalid role");
         }
@@ -63,7 +63,8 @@ public class AuthenticationService {
             JpaRepository<T, Integer> repository,
             String role,
             java.util.function.Function<T, String> usernameMapper,
-            java.util.function.Function<T, String> passwordMapper
+            java.util.function.Function<T, String> passwordMapper,
+            java.util.function.Function<T, Integer> idMapper
     ) {
         Optional<T> userEntityOptional;
         if (role.equals("Citizen")) {
@@ -81,10 +82,11 @@ public class AuthenticationService {
 
         String username = usernameMapper.apply(userEntity);
         String password = passwordMapper.apply(userEntity);
+        Integer userId = idMapper.apply(userEntity);
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, loginUserDto.getPassword()));
 
-        CustomUserDetails userDetails = new CustomUserDetails(username, password, role);
+        CustomUserDetails userDetails = new CustomUserDetails(userId, username, password, role);
         String token = jwtService.generateToken(userDetails);
 
         Map<String, Object> responseData = new HashMap<>();
