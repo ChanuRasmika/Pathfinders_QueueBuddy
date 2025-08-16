@@ -20,7 +20,7 @@ const SignupCard = styled.div`
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 600px;
-  background-color: #f3eee5ff;
+  background-color: #ffffffff;
 `
 
 const Header = styled.div`
@@ -82,13 +82,13 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #701b1bff;
+    border-color: #3b82f6;
   }
 `
 
 const SignupButton = styled.button`
   width: 100%;
-  background-color: #701b1bff;
+  background-color: #3b82f6;
   color: white;
   border: none;
   border-radius: 8px;
@@ -100,11 +100,11 @@ const SignupButton = styled.button`
   margin-bottom: 24px;
 
   &:hover {
-    background-color: #701b1bff;
+    background-color: #3b82f6;
   }
 
   &:active {
-    background-color: #701b1bff;
+    background-color: #3b82f6;
   }
 `
 
@@ -115,7 +115,7 @@ const LoginContainer = styled.div`
 `
 
 const LoginLink = styled.a`
-  color: #701b1bff;
+  color: #3b82f6;
   text-decoration: none;
   cursor: pointer;
 
