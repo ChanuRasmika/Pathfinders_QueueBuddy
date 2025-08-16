@@ -174,7 +174,7 @@ const Login = ({ onSwitchToSignUp }) => {
       }
 
       // Redirect to dashboard or home page
-      navigate("/dashboard"); // Adjust the route as needed
+      navigate("/home"); // Adjust the route as needed
     } catch (error) {
       // Handle errors from the backend
       const errorMessage =
