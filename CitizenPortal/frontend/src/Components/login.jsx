@@ -20,7 +20,7 @@ const LoginCard = styled.div`
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 500px;
-    background-color: #f3eee5ff;
+    background-color: #ffffffff;
 `
 
 const Header = styled.div`
@@ -82,7 +82,7 @@ const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #701b1bff;
+    border-color: #3b82f6;
   }
 `
 
@@ -94,7 +94,7 @@ const ForgotPasswordContainer = styled.div`
 
 const ForgotPasswordLink = styled.a`
   font-size: 14px;
-  color: #701b1bff;
+  color: #3b82f6;
   text-decoration: none;
   cursor: pointer;
 
@@ -105,7 +105,7 @@ const ForgotPasswordLink = styled.a`
 
 const LoginButton = styled.button`
   width: 100%;
-  background-color: #701b1bff;
+  background-color: #3b82f6;
   color: white;
   border: none;
   border-radius: 8px;
@@ -117,11 +117,11 @@ const LoginButton = styled.button`
   margin-bottom: 24px;
 
   &:hover {
-    background-color: #643535ff;
+    background-color: #3b82f6;
   }
 
   &:active {
-    background-color: #643535ff;
+    background-color: #3b82f6;
   }
 `
 
@@ -132,7 +132,7 @@ const SignUpContainer = styled.div`
 `
 
 const SignUpLink = styled.a`
-  color: #701b1bff;
+  color: #3b82f6;
   text-decoration: none;
   cursor: pointer;
 
