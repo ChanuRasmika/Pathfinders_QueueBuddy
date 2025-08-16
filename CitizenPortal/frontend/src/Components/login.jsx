@@ -1,8 +1,6 @@
-
 import { useState } from "react"
 import styled from "styled-components"
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom"
 
 const Container = styled.div`
   min-height: 100vh;
@@ -20,7 +18,7 @@ const LoginCard = styled.div`
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 500px;
-    background-color: #ffffffff;
+  background-color: #ffffffff;
 `
 
 const Header = styled.div`
@@ -117,11 +115,7 @@ const LoginButton = styled.button`
   margin-bottom: 24px;
 
   &:hover {
-    background-color: #3b82f6;
-  }
-
-  &:active {
-    background-color: #3b82f6;
+    background-color: #2563eb;
   }
 `
 
@@ -141,26 +135,22 @@ const SignUpLink = styled.a`
   }
 `
 
-const Login = ({ onSwitchToSignUp }) => {
+const Login = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-    const navigate = useNavigate()
+  const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Handle login logic here
     console.log("Login attempt:", { email, password })
+
+    // ✅ Navigate to Home after login
+    navigate("/home")
   }
 
   const handleForgotPassword = () => {
-    // Handle forgot password logic here
     console.log("Forgot password clicked")
   }
-
-const handleSignUp = () => {
-  onSwitchToSignUp();
-};
-
 
   return (
     <Container>
@@ -198,14 +188,16 @@ const handleSignUp = () => {
           </FormGroup>
 
           <ForgotPasswordContainer>
-            <ForgotPasswordLink onClick={handleForgotPassword}>Forgot password?</ForgotPasswordLink>
+            <ForgotPasswordLink onClick={handleForgotPassword}>
+              Forgot password?
+            </ForgotPasswordLink>
           </ForgotPasswordContainer>
 
           <LoginButton type="submit">Log In</LoginButton>
 
           <SignUpContainer>
             {"Don't have an account? "}
-             <SignUpLink onClick={() => navigate("/signup")}>Sign up</SignUpLink>
+            <SignUpLink onClick={() => navigate("/signup")}>Sign up</SignUpLink>
           </SignUpContainer>
         </Form>
       </LoginCard>
