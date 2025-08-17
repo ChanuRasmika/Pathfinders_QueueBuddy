@@ -1,6 +1,6 @@
 "use client"
 import {useEffect, useState} from "react"
-import { useNavigate } from "react-router-dom"; // added for navigation
+import { useNavigate } from "react-router-dom"; 
 import styled from "styled-components"
 import { getUserProfile, updateUserProfile } from "./api/userService.jsx"
 
